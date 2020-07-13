@@ -1,0 +1,6 @@
+*/node_modules/
+*/mongo-volume/
+*/dist/
+config/
+server/public/*
+docker-compose.yml

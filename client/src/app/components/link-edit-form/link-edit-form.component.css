@@ -1,0 +1,14 @@
+.short-input-group {
+  display: flex;
+}
+
+.short-url-prefix {
+  width: 7.2em;
+  margin-right: -1px;
+}
+
+/*
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at http://angular.io/license
+*/

@@ -1,0 +1,83 @@
+<div class="jumbotron justify-content-lg-center">
+  <h2 class="display-3">Free short link service</h2>
+  <p class="lead">shorter is better</p>
+  <hr class="my-4" />
+  <form [formGroup]="linkEditForm" (ngSubmit)="onSubmit(linkEditForm.value)">
+    <div for="shortUrl">
+      <div>Short url</div>
+      <div class="short-input-group">
+        <input
+          type="text"
+          class="form-control short-url-prefix"
+          readonly
+          placeholder="bosong.link/"
+        />
+        <input
+          id="shortUrl"
+          type="text"
+          formControlName="shortUrl"
+          class="form-control"
+          (keyup)="onShortUrlUpdate($event.target.value)"
+          [ngClass]="{
+            'is-valid': shortUrl.valid,
+            'is-invalid': shortUrlInvalid
+          }"
+          required
+        />
+      </div>
+      <div *ngIf="shortUrl.invalid && (shortUrl.dirty || shortUrl.touched)">
+        <div *ngIf="shortUrl.errors.required" class="text-danger">
+          *required
+        </div>
+        <div *ngIf="shortUrl.errors.pattern" class="text-danger">
+          *only letters, numbers, dashes('-') and underscores('_') are allowed
+          in short url
+        </div>
+      </div>
+      <div *ngIf="originalUrlInDb" class="text-warning">
+        url already exists and points to [{{ originalUrlInDb }}], but you can
+        still continue to modify it
+      </div>
+    </div>
+    <div for="originalUrl">
+      <div>Original url</div>
+      <input
+        id="originalUrl"
+        type="text"
+        formControlName="originalUrl"
+        class="form-control"
+        (keyup)="onOriginalUrlUpdate($event.target.value)"
+        [ngClass]="{
+          'is-valid': originalUrl.valid,
+          'is-invalid': originalUrlInvalid
+        }"
+        [disabled]="
+          (linkLoadingState$ | async) == state.PENDING ||
+          (linkCreationState$ | async) == state.PENDING
+        "
+        required
+      />
+      <div *ngIf="originalUrlInvalid">
+        <div *ngIf="originalUrl.errors.required" class="text-danger">
+          *required
+        </div>
+        <div *ngIf="originalUrl.errors.pattern" class="text-danger">
+          *not a valid url
+        </div>
+      </div>
+    </div>
+    <button
+      class="button"
+      class="btn btn-primary"
+      type="submit"
+      [disabled]="!isSubmittable()"
+    >
+      {{ submitButtonUiString() }}
+    </button>
+  </form>
+</div>
+<!-- 
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at http://angular.io/license
+-->

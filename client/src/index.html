@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Free Short link</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-58023161-2"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "UA-58023161-2");
+
+      // Google Analytics Embed API library
+      // reference: https://ga-dev-tools.appspot.com/embed-api/server-side-authorization/
+      // Adding the script to dashboard HTML (script tag is stripped by angular) or dashboard.ts does not work.
+      (function (w, d, s, g, js, fs) {
+        g = w.gapi || (w.gapi = {});
+        g.analytics = {
+          q: [],
+          ready: function (f) {
+            this.q.push(f);
+          },
+        };
+        js = d.createElement(s);
+        fs = d.getElementsByTagName(s)[0];
+        js.src = "https://apis.google.com/js/platform.js";
+        fs.parentNode.insertBefore(js, fs);
+        js.onload = function () {
+          g.load("analytics");
+        };
+      })(window, document, "script");
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="mat-typography">
+    <app-root></app-root>
+  </body>
+</html>

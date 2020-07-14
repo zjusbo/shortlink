@@ -7,8 +7,8 @@ const DEFAULT_PROTOCOL = 'http://';
 
 @Component({
   selector: 'app-redirect-component',
-  template: '',
-  styles: [],
+  templateUrl: 'redirect.component.html',
+  styleUrls: ['redirect.component.css'],
 })
 export class RedirectComponent implements OnInit {
   constructor(
@@ -16,6 +16,8 @@ export class RedirectComponent implements OnInit {
     private router: Router,
     private linkService: LinkService
   ) {}
+
+  originalUrl = '...';
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
@@ -33,6 +35,7 @@ export class RedirectComponent implements OnInit {
             // add default protocol
             originalLink = DEFAULT_PROTOCOL + originalLink;
           }
+          this.originalUrl = originalLink;
           window.location.href = originalLink;
         }
       });

@@ -1,26 +1,27 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-
-import { AppComponent } from './app.component';
-import { LinkEditComponent } from './components/link-edit-form/link-edit-form.component';
-import { RedirectComponent } from './components/redirect/redirect.component';
-import { LinkService } from './services/link.service';
 import { HttpClientModule } from '@angular/common/http';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { NavBarComponent } from './components/nav-bar/nav-bar.component';
-import { GaTokenService } from './services/ga.token.service';
+import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
+import { AppComponent } from './app.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { LinkEditComponent } from './components/link-edit-form/link-edit-form.component';
+import { NavBarComponent } from './components/nav-bar/nav-bar.component';
+import { RedirectComponent } from './components/redirect/redirect.component';
+import { GaTokenService } from './services/ga.token.service';
+import { LinkService } from './services/link.service';
+
 @NgModule({
   imports: [
     BrowserModule,
     ReactiveFormsModule,
     HttpClientModule,
     MatSnackBarModule,
+    MatProgressBarModule,
     MatProgressSpinnerModule,
     RouterModule.forRoot([
       { path: '', component: LinkEditComponent },
@@ -37,6 +38,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     LinkEditComponent,
     DashboardComponent,
     NavBarComponent,
+    RedirectComponent,
   ],
   bootstrap: [AppComponent],
   providers: [LinkService, GaTokenService],

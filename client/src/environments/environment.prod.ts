@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  serverAddress: 'http://bosong.link',
+  serverAddress: 'https://bosong.link',
   hostname: 'bosong.link',
 };

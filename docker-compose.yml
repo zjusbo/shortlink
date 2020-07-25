@@ -44,13 +44,17 @@ services:
     container_name: nginx
     ports:
       - 80:80
+      - 443:443
     volumes:
       - web-root:/var/www/html
       - ./config/nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
     depends_on:
       - app
+    networks:
+      - app-network
 
   certbot:
     image: certbot/certbot
@@ -61,7 +65,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email songbo.sunny@gmail.com --agree-tos --no-eff-email --staging -d bosong.link  -d www.bosong.link
+    command: certonly --webroot --webroot-path=/var/www/html --email songbo.sunny@gmail.com --agree-tos --no-eff-email --force-renewal -d bosong.link  -d www.bosong.link
 
 volumes:
   mongo-volume:
@@ -71,7 +75,13 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/shortlink/views/
+      device: /root/views/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /root/dhparam/
       o: bind
 
 networks:

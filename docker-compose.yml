@@ -1,0 +1,79 @@
+# Production configuration
+# WARNING: Do not push this file to public. This compose file contains sensitive configuration
+# Please use secure file transfer protocol to transfer this file to your server
+# then run
+# $ docker-compose up
+# to depoly the service
+version: "3.7"
+services:
+  app: # web app service
+    image: "sbdxxcjh/shortlink"
+    container_name: app
+    command: node index.js
+    working_dir: /app
+    volumes:
+      - ./config/short-link-service-281615-f8909019adc5.json:/app/short-link-service-281615-f8909019adc5.json:ro
+    environment:
+      MONGO_HOST: mongo # This should be the same as the databse service name in this file
+      MONGO_USERNAME: shortlinkApp # This should keep the same as that in the init-mongo.js file
+      MONGO_PASSWORD: skneksie34#42ksoe)lnes!
+      MONGO_DB: links # keep it the same as the MONGO_INITDB_DATABASE
+      GOOGLE_APPLICATION_CREDENTIALS: ./short-link-service-281615-f8909019adc5.json # path to the google service account credential file
+    depends_on:
+      - mongo # only starts the app server after all its dependencies are ready.
+    networks: # open all ports on the 'app-network' for inter containers communication
+      - app-network
+
+  mongo: # This is the service name as well as the network alias/hostname
+    image: "mongo"
+    container_name: "my-mongo-container"
+    environment:
+      - MONGO_INITDB_DATABASE=links # this is the DB the inti-mongo.js will run on
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=dbDies#we%isk21
+    volumes:
+      - ./config/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro # init username and password for webapp
+      - ./config/data.csv:/app/data.csv:ro # data.csv contains the prefilled data. To populate data.csv into the DB, please run the following command
+      - mongo-volume:/data/db
+    networks:
+      - app-network
+  # The nginx and cerbot setting for HTTPS support is referred from
+  # https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose
+  nginx: # frontend proxy service
+    image: nginx:mainline-alpine
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - app
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email songbo.sunny@gmail.com --agree-tos --no-eff-email --staging -d bosong.link  -d www.bosong.link
+
+volumes:
+  mongo-volume:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/shortlink/views/
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge

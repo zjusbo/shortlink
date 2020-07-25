@@ -18,7 +18,8 @@ services:
       GOOGLE_APPLICATION_CREDENTIALS: ../config/short-link-service-281615-f8909019adc5.json # path to the google service account credential file
     depends_on:
       - mongo # only starts the app server after all its dependencies are ready.
-
+    networks:
+      - app-network
   mongo: # This is the service name as well as the network alias/hostname
     image: "mongo"
     container_name: "my-mongo-container"
@@ -30,5 +31,10 @@ services:
       - ./dev-init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       # NOTE: Be sure to remove this mongo-volume folder if you want the init-mongo.js to be run.
       - ./server/mongo-volume:/data/db
-    ports:
-      - "27017-27019:27017-27019"
+    networks:
+      - app-network
+      # ports:
+      # - "27017-27019:27017-27019"
+networks:
+  app-network:
+    driver: bridge

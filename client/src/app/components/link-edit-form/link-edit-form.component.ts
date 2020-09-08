@@ -1,25 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
-  AbstractControl, FormBuilder,
-
-  FormControl, FormGroup,
-
-  Validators
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
 } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { LinkService } from 'client/src/app/services/link.service';
 import { environment as env } from 'client/src/environments/environment';
 import { BehaviorSubject, Subject } from 'rxjs';
-import {
-  auditTime,
-  filter,
-  switchMap,
-  takeUntil,
-  tap
-} from 'rxjs/operators';
+import { auditTime, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Link } from 'server/src/interfaces/linkResponse';
-
 
 export enum State {
   INIT,
@@ -135,6 +128,10 @@ export class LinkEditComponent implements OnInit, OnDestroy {
   }
 
   onShortUrlUpdate(value: string) {
+    // to lowercase
+    value = value.toLowerCase();
+    this.shortUrl.setValue(value);
+
     this.shortUrlValue$.next(value);
     this.linkCreationState$.next(State.INIT);
   }

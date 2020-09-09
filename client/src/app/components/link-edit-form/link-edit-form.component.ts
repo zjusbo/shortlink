@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -53,6 +53,15 @@ export class LinkEditComponent implements OnInit, OnDestroy {
         Validators.pattern('.+\\..+'),
       ]),
     });
+  }
+
+  @HostListener('document:keyup', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && event.code === 'Enter') {
+      // ctrl + enter. Submit the form
+      this.onSubmit(this.linkEditForm);
+      return;
+    }
   }
 
   ngOnDestroy() {

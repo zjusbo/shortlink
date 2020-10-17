@@ -21,7 +21,7 @@ export class RedirectComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const shortLink = params.get('link');
+      const shortLink = params.get('link').toLocaleLowerCase();
       this.linkService.getLink(shortLink).subscribe((link) => {
         if (link == null) {
           // short_link does not exist in DB

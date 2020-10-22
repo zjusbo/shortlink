@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { LinkResponse, Link } from 'server/src/interfaces/linkResponse';
+import { Injectable } from '@angular/core';
 import { environment } from 'client/src/environments/environment';
+import { Observable, throwError } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Link, Links, parseLinks } from 'server/src/interfaces/link';
+import { LinkResponse } from 'server/src/interfaces/linkResponse';
 
 const LINK_API_PATH = '/api/link';
 
@@ -12,10 +13,12 @@ const LINK_API_PATH = '/api/link';
 })
 export class LinkService {
   constructor(private http: HttpClient) {}
-  getAllLinks() {
-    return this.http
-      .get(environment.serverAddress + LINK_API_PATH)
-      .pipe(tap((res) => console.log(res)));
+  getAllLinks(): Observable<Links> {
+    return this.http.get(environment.serverAddress + LINK_API_PATH).pipe(
+      map((res) => {
+        return parseLinks(JSON.stringify(res));
+      })
+    );
   }
 
   getLink(shortLink: string): Observable<Link> {

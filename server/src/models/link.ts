@@ -14,8 +14,11 @@ const LinkSchema = mongoose.Schema({
   ip: {
     type: String,
   },
-  creation_time: {
+  creation_date: {
     type: Date,
+  },
+  usage_count: {
+    type: Number,
   },
 });
 

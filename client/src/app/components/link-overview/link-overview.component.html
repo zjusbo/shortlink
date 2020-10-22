@@ -1,0 +1,23 @@
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Index</th>
+      <th scope="col">Short Link</th>
+      <th scope="col">Original Link</th>
+      <th scope="col">Creation Date</th>
+      <th scope="col">Usage Count</th>
+    </tr>
+  </thead>
+  <div *ngIf="status === state.PENDING">Loading...</div>
+  <tbody>
+    <tr *ngFor="let link of links; let i = index">
+      <td>{{ i }}</td>
+      <td>{{ link.shortLink }}</td>
+      <td>
+        <a [href]="link.originalLink | hrefUrl">{{ link.originalLink}}</a>
+      </td>
+      <td>{{ link.creationDate | date }}</td>
+      <td>{{ link.usageCount }}</td>
+    </tr>
+  </tbody>
+</table>

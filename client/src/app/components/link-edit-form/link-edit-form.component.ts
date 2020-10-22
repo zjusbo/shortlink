@@ -9,17 +9,11 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { LinkService } from 'client/src/app/services/link.service';
+import { State } from 'client/src/app/shared/consts';
 import { environment as env } from 'client/src/environments/environment';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { auditTime, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Link } from 'server/src/interfaces/linkResponse';
-
-export enum State {
-  INIT,
-  PENDING,
-  SUCCESS,
-  ERROR,
-}
+import { Link } from 'server/src/interfaces/link';
 
 @Component({
   selector: 'link-edit-form',

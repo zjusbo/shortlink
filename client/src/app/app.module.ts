@@ -10,10 +10,12 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LinkEditComponent } from './components/link-edit-form/link-edit-form.component';
+import { LinkOverviewComponent } from './components/link-overview/link-overview.component';
 import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { RedirectComponent } from './components/redirect/redirect.component';
 import { GaTokenService } from './services/ga.token.service';
 import { LinkService } from './services/link.service';
+import { HrefUrlPipe } from './shared/href-url.pipe';
 
 @NgModule({
   imports: [
@@ -26,6 +28,7 @@ import { LinkService } from './services/link.service';
     RouterModule.forRoot([
       { path: '', component: LinkEditComponent },
       { path: 'dashboard', component: DashboardComponent },
+      { path: 'links', component: LinkOverviewComponent },
       { path: 'edit/:link', component: LinkEditComponent },
       { path: ':link', component: RedirectComponent },
       // Redirect to link edit component if the link does not exist
@@ -36,6 +39,8 @@ import { LinkService } from './services/link.service';
   declarations: [
     AppComponent,
     LinkEditComponent,
+    HrefUrlPipe,
+    LinkOverviewComponent,
     DashboardComponent,
     NavBarComponent,
     RedirectComponent,

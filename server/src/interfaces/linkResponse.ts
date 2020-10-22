@@ -1,12 +1,9 @@
+import { Link } from "./link";
+
 export enum Status {
   UNKNOWN = "UNKNOWN",
   OK = "OK",
   FAILED = "FAILED",
-}
-
-export interface Link {
-  shortLink: string;
-  originalLink: string;
 }
 
 export class LinkResponse {
@@ -70,6 +67,8 @@ export class LinkResponse {
       link = {
         originalLink: data["originalLink"],
         shortLink: data["shortLink"],
+        creationDate: data["creationDate"],
+        usageCount: data["usageCount"] ?? 0,
       };
     }
 

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LinkService } from 'client/src/app/services/link.service';
-
-// Default protocol is added as prefix to the original_link if no protocol is presented in the link
-const DEFAULT_PROTOCOL = 'http://';
+import { DEFAULT_PROTOCOL } from '../../shared/consts';
+import { isContainProtocol } from '../../shared/utils';
 
 @Component({
   selector: 'app-redirect-component',
@@ -31,7 +30,7 @@ export class RedirectComponent implements OnInit {
           // redirect to the original_link
           const protoPattern = /^\w{1,5}:\/\//g;
           let originalLink = link.originalLink;
-          if (!protoPattern.test(originalLink)) {
+          if (!isContainProtocol(originalLink)) {
             // add default protocol
             originalLink = DEFAULT_PROTOCOL + originalLink;
           }

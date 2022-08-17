@@ -3,3 +3,4 @@
 */dist/
 config/
 server/public/*
+docker-compose.yml

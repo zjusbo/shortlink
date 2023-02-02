@@ -47,7 +47,7 @@
     "mongoose": "^5.9.18"
   },
   "devDependencies": {
-    "@angular/cli": "^9.1.8",
+    "@angular/cli": "^15.1.4",
     "@types/express": "^4.17.6",
     "@types/mongoose": "^5.7.25",
     "concurrently": "^5.2.0",

@@ -6,6 +6,9 @@ export const environment = {
   production: false,
   serverAddress: 'http://localhost:3000',
   hostname: 'localhost:3000',
+  // Replace with your reCAPTCHA v3 site key from https://www.google.com/recaptcha/admin/create
+  // Leave as empty string to disable reCAPTCHA in development
+  recaptchaSiteKey: '6LdXDY0sAAAAAKJ7U49EPtnCD3HkzB2w15l2ISu9',
 };
 
 /*

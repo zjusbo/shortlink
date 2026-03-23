@@ -37,13 +37,14 @@ export class LinkService {
       );
   }
 
-  addLink(link: Link): Observable<Link> {
-    const headers = new HttpHeaders();
-    headers.append('Content-Type', 'application/json');
+  addLink(link: Link, recaptchaToken: string = ''): Observable<Link> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http
-      .post(environment.serverAddress + LINK_API_PATH, link, {
-        headers,
-      })
+      .post(
+        environment.serverAddress + LINK_API_PATH,
+        { shortLink: link.shortLink, originalLink: link.originalLink, recaptchaToken },
+        { headers }
+      )
       .pipe(
         map((res) => {
           const response: LinkResponse = LinkResponse.fromJson(

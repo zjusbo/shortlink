@@ -16,6 +16,7 @@ services:
       MONGO_PASSWORD: secret
       MONGO_DB: links # keep it the same as the MONGO_INITDB_DATABASE
       GOOGLE_APPLICATION_CREDENTIALS: ../config/short-link-service-281615-f8909019adc5.json # path to the google service account credential file
+      RECAPTCHA_SECRET_KEY: "" # Set to your reCAPTCHA v3 secret key from https://www.google.com/recaptcha/admin/create (do not commit the real key)
     depends_on:
       - mongo # only starts the app server after all its dependencies are ready.
     networks:

@@ -1,9 +1,74 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
+import https from "https";
 import { Links } from "../interfaces/link";
 import { LinkResponse } from "../interfaces/linkResponse";
 import { LinkModel } from "../models/link";
 import { getAccessToken } from "./ga";
+
 export const router = express.Router();
+
+// --- Rate limiting: max 20 link creations per IP per 15 minutes ---
+const createLinkLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { success: false, msg: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// --- reCAPTCHA v3 server-side verification ---
+function verifyRecaptcha(token: string): Promise<boolean> {
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  if (!secret) {
+    // Secret key not configured — skip verification (development mode)
+    console.warn("RECAPTCHA_SECRET_KEY not set; skipping reCAPTCHA verification");
+    return Promise.resolve(true);
+  }
+  return new Promise((resolve) => {
+    const postData = new URLSearchParams({ secret, response: token }).toString();
+    const options = {
+      hostname: "www.google.com",
+      path: "/recaptcha/api/siteverify",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": Buffer.byteLength(postData),
+      },
+    };
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.on("data", (chunk) => { data += chunk; });
+      res.on("end", () => {
+        try {
+          const result = JSON.parse(data);
+          // v3: score >= 0.5 is considered human; v2 has no score field
+          const passed =
+            result.success === true &&
+            (result.score === undefined || result.score >= 0.5);
+          resolve(passed);
+        } catch {
+          resolve(false);
+        }
+      });
+    });
+    req.on("error", () => resolve(false));
+    req.write(postData);
+    req.end();
+  });
+}
+
+// --- URL validation: only allow http and https schemes ---
+function isValidUrl(url: string): boolean {
+  try {
+    // Prepend https:// if no scheme is present so URL constructor can parse it
+    const normalized = /^\w+:\/\//.test(url) ? url : "https://" + url;
+    const parsed = new URL(normalized);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 router.get("/link", (req, res) => {
   LinkModel.find(function (error, links) {
@@ -48,11 +113,30 @@ router.get("/link/:shortlink", (req, res) => {
   });
 });
 
-router.post("/link", (req, res) => {
+router.post("/link", createLinkLimiter, async (req, res) => {
   if (!req.body.shortLink || !req.body.originalLink) {
     res.json(LinkResponse.fail("shortLink or originalLink key does not exist"));
     return;
   }
+
+  // Server-side URL validation — blocks javascript:, data:, and other unsafe schemes
+  if (!isValidUrl(req.body.originalLink)) {
+    res
+      .status(400)
+      .json(LinkResponse.fail("Invalid URL: only http and https are allowed"));
+    return;
+  }
+
+  // reCAPTCHA verification
+  const recaptchaToken: string = req.body.recaptchaToken || "";
+  const isHuman = await verifyRecaptcha(recaptchaToken);
+  if (!isHuman) {
+    res
+      .status(400)
+      .json(LinkResponse.fail("reCAPTCHA verification failed. Please try again."));
+    return;
+  }
+
   const condition = { short_link: req.body.shortLink };
   const update = {
     short_link: req.body.shortLink,

@@ -63,6 +63,14 @@ export class LinkEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // Dynamically load reCAPTCHA v3 script if a site key is configured
+    if (env.recaptchaSiteKey && !document.querySelector('script[src*="recaptcha/api.js"]')) {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${env.recaptchaSiteKey}`;
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
     this.shortUrlValue$
       .pipe(
         takeUntil(this.destroyed),
@@ -171,13 +179,38 @@ export class LinkEditComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(linkEditForm) {
+    const grecaptcha = (window as any).grecaptcha;
+    if (env.recaptchaSiteKey && grecaptcha) {
+      // reCAPTCHA v3 is configured — execute it before submitting
+      grecaptcha.ready(() => {
+        grecaptcha
+          .execute(env.recaptchaSiteKey, { action: 'submit_link' })
+          .then((token: string) => {
+            this._doSubmit(linkEditForm, token);
+          })
+          .catch(() => {
+            this.linkCreationState$.next(State.ERROR);
+            this.snackBar.open(
+              'reCAPTCHA error. Please refresh and try again.',
+              'dismiss',
+              { duration: 4000 }
+            );
+          });
+      });
+    } else {
+      // No reCAPTCHA configured (development) — submit without token
+      this._doSubmit(linkEditForm, '');
+    }
+  }
+
+  private _doSubmit(linkEditForm, recaptchaToken: string) {
     const link: Link = {
       shortLink: linkEditForm.shortUrl,
       originalLink: linkEditForm.originalUrl,
     };
     this.linkCreationState$.next(State.PENDING);
     this.linkService
-      .addLink(link)
+      .addLink(link, recaptchaToken)
       .pipe(takeUntil(this.destroyed))
       .subscribe(
         (response) => {

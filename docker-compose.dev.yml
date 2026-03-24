@@ -2,7 +2,7 @@
 version: "3.7"
 services:
   app:
-    image: node:18-alpine
+    image: node:20-alpine
     command: sh -c "(cd server && yarn install) && (cd client && yarn install) && (cd server && yarn run dev)"
     ports:
       - 4200:4200

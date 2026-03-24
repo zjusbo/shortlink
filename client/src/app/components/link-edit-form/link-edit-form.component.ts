@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LinkService } from 'client/src/app/services/link.service';
 import { State } from 'client/src/app/shared/consts';
 import { environment as env } from 'client/src/environments/environment';
+import * as QRCode from 'qrcode';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { auditTime, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Link } from 'server/src/interfaces/link';
@@ -28,6 +29,8 @@ export class LinkEditComponent implements OnInit, OnDestroy {
   originalUrlInDb = '';
   environment = env;
   shortUrlValue$ = new Subject<string>();
+  qrCodeDataUrl = '';
+  lastCreatedShortUrl = '';
 
   destroyed = new Subject<void>();
 
@@ -145,37 +148,39 @@ export class LinkEditComponent implements OnInit, OnDestroy {
 
     this.shortUrlValue$.next(value);
     this.linkCreationState$.next(State.INIT);
+    this.qrCodeDataUrl = '';
   }
 
   onOriginalUrlUpdate(value: string) {
     this.linkCreationState$.next(State.INIT);
+    this.qrCodeDataUrl = '';
   }
 
-  /**
-   * For extensibility, we create a temp textarea element.
-   */
-  copyToClipboard(value: string) {
+  /** Copy text to clipboard — uses modern Clipboard API with execCommand fallback. */
+  async copyToClipboard(value: string): Promise<void> {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(value);
+        return;
+      }
+    } catch (_) {
+      // Fall through to execCommand fallback
+    }
+    // Fallback: works on older browsers and iOS Safari without HTTPS
     const textarea = document.createElement('textarea');
-    textarea.style.height = '0px';
-    textarea.style.left = '-100px';
-    textarea.style.opacity = '0';
-    textarea.style.position = 'fixed';
-    textarea.style.top = '-100px';
-    textarea.style.width = '0px';
+    textarea.style.cssText = 'position:fixed;top:-100px;left:-100px;width:0;height:0;opacity:0;';
     document.body.appendChild(textarea);
-    // Set and select the value (creating an active Selection range).
     textarea.value = value;
     textarea.select();
-    // Ask the browser to copy the current selection to the clipboard.
-    const successful = document.execCommand('copy');
-    if (successful) {
-      // show banner
-    } else {
-      // handle the error
-    }
-    if (textarea && textarea.parentNode) {
-      textarea.parentNode.removeChild(textarea);
-    }
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+
+  downloadQrCode() {
+    const link = document.createElement('a');
+    link.download = `qr-${this.lastCreatedShortUrl}.png`;
+    link.href = this.qrCodeDataUrl;
+    link.click();
   }
 
   onSubmit(linkEditForm) {
@@ -217,16 +222,21 @@ export class LinkEditComponent implements OnInit, OnDestroy {
           this.linkCreationState$.next(State.SUCCESS);
           this.linkEditForm.markAsUntouched();
           this.linkEditForm.markAsPristine();
-          const completedShortUrl =
-            env.serverAddress + '/' + linkEditForm.shortUrl;
+
+          const completedShortUrl = env.serverAddress + '/' + linkEditForm.shortUrl;
+          this.lastCreatedShortUrl = linkEditForm.shortUrl;
+
           this.copyToClipboard(completedShortUrl);
           this.snackBar.open(
-            `${completedShortUrl} was created and copied to your clipboard`,
+            `${completedShortUrl} copied to clipboard`,
             'dismiss',
-            {
-              duration: 4000,
-            }
+            { duration: 4000 }
           );
+
+          // Generate QR code for the created short link
+          QRCode.toDataURL(completedShortUrl, { width: 280, margin: 2 })
+            .then((dataUrl) => { this.qrCodeDataUrl = dataUrl; })
+            .catch((err) => console.error('QR generation failed', err));
         },
         (error) => {
           this.linkCreationState$.next(State.ERROR);

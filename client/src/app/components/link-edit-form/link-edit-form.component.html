@@ -75,8 +75,29 @@
       {{ submitButtonUiString() }}
     </button>
   </form>
+
+  <!-- QR code panel — shown after a link is created -->
+  <div *ngIf="qrCodeDataUrl" class="qr-section">
+    <hr class="my-4" />
+    <p class="qr-label">
+      Scan or long-press to save &nbsp;·&nbsp;
+      <a [href]="environment.serverAddress + '/' + lastCreatedShortUrl" target="_blank">
+        {{ environment.serverAddress }}/{{ lastCreatedShortUrl }}
+      </a>
+    </p>
+    <img
+      [src]="qrCodeDataUrl"
+      alt="QR code for {{ environment.serverAddress }}/{{ lastCreatedShortUrl }}"
+      class="qr-image"
+    />
+    <div class="qr-actions">
+      <button class="btn btn-outline-secondary btn-sm" (click)="downloadQrCode()">
+        ⬇ Download QR Code
+      </button>
+    </div>
+  </div>
 </div>
-<!-- 
+<!--
 Copyright Google LLC. All Rights Reserved.
 Use of this source code is governed by an MIT-style license that
 can be found in the LICENSE file at http://angular.io/license

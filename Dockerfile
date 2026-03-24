@@ -1,7 +1,7 @@
 # BUILD PRODUCTION IMAGE
 
 # build the builder image, which builds the project
-FROM node:12-alpine AS builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 
 COPY ./client/package.json ./client/
@@ -14,7 +14,7 @@ COPY . .
 RUN cd server && npm run build
 
 # fetch the dist files to a clean nodeJS image
-FROM node:12-alpine AS dist
+FROM node:18-alpine AS dist
 WORKDIR /app
 COPY ./server/package.json ./
 RUN yarn install --production

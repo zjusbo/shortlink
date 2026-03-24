@@ -11,7 +11,7 @@ export const router = express.Router();
 // --- Rate limiting: max 20 link creations per IP per 15 minutes ---
 const createLinkLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  limit: 20,
   message: { success: false, msg: "Too many requests, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,

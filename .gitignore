@@ -4,3 +4,5 @@
 config/
 server/public/*
 docker-compose.yml
+.claude
+.DS_STORE

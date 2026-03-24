@@ -154,3 +154,7 @@ db.createUser({
 4. build and push the image `docker build . -t shortlink && docker push shortlink`
 
 5. On your server machine, run `docker-compose up -d`
+
+
+Note: Alternatively, you can just upload the code to github. The github workflow will build and push the docker image to docker.io for you. 
+The path on docker id is "ghcr.io/zjusbo/shortlink:latest"

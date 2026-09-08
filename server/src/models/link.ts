@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose, { InferSchemaType } from "mongoose";
 
-const LinkSchema = mongoose.Schema({
+const LinkSchema = new mongoose.Schema({
   short_link: {
     type: String,
     required: true,
@@ -21,5 +21,7 @@ const LinkSchema = mongoose.Schema({
     type: Number,
   },
 });
+
+export type LinkDoc = InferSchemaType<typeof LinkSchema>;
 
 export const LinkModel = mongoose.model("links", LinkSchema);

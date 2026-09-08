@@ -1,5 +1,4 @@
 // import modules
-import bodyparser from "body-parser";
 import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
@@ -18,7 +17,7 @@ const {
 // connect to mongo db, using username and password. the default port is 27017
 const mongoAddress = `mongodb://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:27017/${DB_NAME}`;
 mongoose
-  .connect(mongoAddress, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoAddress)
   .catch((error) => {
     console.error(`can not connect to the database: ${mongoAddress}`);
     console.error(error);
@@ -42,8 +41,8 @@ const port = 3000;
 // these middlewares should be added before the router
 app.use(cors());
 
-// body-parser
-app.use(bodyparser.json());
+// JSON body parsing (built into Express)
+app.use(express.json());
 
 // static files
 // all static files .html, .js, .css are being searched under the public folder.

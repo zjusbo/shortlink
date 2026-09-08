@@ -11,9 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { GoogleAuth } = require("google-auth-library");
+import { GoogleAuth, AuthClient } from "google-auth-library";
 
-let client;
+let client: AuthClient | undefined;
 
 async function init() {
   const auth = new GoogleAuth({
@@ -28,11 +28,11 @@ async function init() {
  * Source code: https://github.com/googleapis/google-auth-library-nodejs/blob/master/src/auth/oauth2client.ts#L703
  *
  */
-export async function getAccessToken(): Promise<string> {
+export async function getAccessToken(): Promise<string | null | undefined> {
   if (!client) {
     await init();
   }
-  return (await client.getAccessToken()).token;
+  return (await client!.getAccessToken()).token;
 }
 
 init().catch(console.error);

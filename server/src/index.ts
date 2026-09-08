@@ -15,7 +15,11 @@ const {
 } = process.env;
 
 // connect to mongo db, using username and password. the default port is 27017
-const mongoAddress = `mongodb://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:27017/${DB_NAME}`;
+// Credentials are percent-encoded so passwords containing characters such as
+// '#', '!' or ')' are accepted by the MongoDB driver.
+const mongoAddress = `mongodb://${encodeURIComponent(DB_USERNAME ?? "")}:${encodeURIComponent(
+  DB_PASSWORD ?? ""
+)}@${DB_HOST}:27017/${DB_NAME}`;
 mongoose
   .connect(mongoAddress)
   .catch((error) => {

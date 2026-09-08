@@ -116,7 +116,7 @@ services:
       - mongo # only starts the app server after all its dependencies are ready.
 
   mongo: # This is the service name as well as the network alias/hostname
-    image: "mongo"
+    image: "mongo:7" # pin a major version; the app is tested against MongoDB 7
     container_name: "my-mongo-container"
     environment:
       - MONGO_INITDB_DATABASE=links # this is the DB the inti-mongo.js will run on
@@ -126,8 +126,7 @@ services:
       - ./config/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro # init username and password for webapp
       - ./config/data.csv:/app/data.csv:ro # data.csv contains the prefilled data. To populate data.csv into the DB, please run the following command
       - mongo-volume:/data/db
-    ports:
-      - "27017-27019:27017-27019"
+    # Do not publish MongoDB ports to the host; the app reaches it over the compose network.
 volumes:
   mongo-volume:
 ```
